@@ -10,7 +10,7 @@ import (
 	"os"
 )
 
-var broker = "tcp://test.mosquitto.org:1883"
+var broker = "10.100.3.14:1883"
 
 var Publisher = &cobra.Command{
 	Use:   "publisher",
@@ -19,11 +19,17 @@ var Publisher = &cobra.Command{
 }
 
 func publish(cmd *cobra.Command, args []string) error {
+	tlsConfig := &tls.Config{InsecureSkipVerify: true, ClientAuth: tls.NoClientCert}
+	//tlsConfig, err := security.NewTLSConfig()
+	//if err != nil {
+	//	return err
+	//}
+
 	opts := mqtt.NewClientOptions().
 		AddBroker(broker).
 		SetClientID("sirpurrfection").
 		SetCleanSession(true).
-		SetTLSConfig(&tls.Config{InsecureSkipVerify: true, ClientAuth: tls.NoClientCert})
+		SetTLSConfig(tlsConfig)
 
 	publisher := mqtt.NewClient(opts)
 	logrus.Infof("publisher is connecting to %s", broker)

@@ -3,10 +3,11 @@ package security
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"errors"
 	"io/ioutil"
 )
 
-func NewTLSConfig() (*tls.Config, error) {
+func NewTLSConfigWithClientCertificates() (*tls.Config, error) {
 	// Import trusted certificates from CAfile.pem.
 	// Alternatively, manually add CA certificates to
 	// default openssl CA bundle.
@@ -47,5 +48,31 @@ func NewTLSConfig() (*tls.Config, error) {
 		InsecureSkipVerify: false,
 		// Certificates = list of certs client sends to server.
 		Certificates: []tls.Certificate{cert},
+	}, nil
+}
+
+func NewTLSConfig() (*tls.Config, error) {
+	// Get the SystemCertPool, continue with an empty pool on error
+	roots, _ := x509.SystemCertPool()
+	if roots == nil {
+		roots = x509.NewCertPool()
+	}
+
+	certs, err := ioutil.ReadFile("security/mosquitto.org.crt")
+	if err != nil {
+		return nil, err
+	}
+
+	if ok := roots.AppendCertsFromPEM(certs); !ok {
+		return nil, errors.New("failed to append to root CA")
+	}
+
+	// Create tls.Config with desired tls properties
+	return &tls.Config{
+		MinVersion: tls.VersionTLS10,
+		MaxVersion: tls.VersionTLS10,
+		RootCAs:            roots,
+		ClientAuth:         tls.NoClientCert,
+		InsecureSkipVerify: false,
 	}, nil
 }
