@@ -3,14 +3,22 @@ package cmd
 import (
 	"bufio"
 	"crypto/tls"
+	"io"
+	"os"
+
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"io"
-	"os"
 )
 
-var broker = "10.100.3.14:1883"
+// Mosquitto
+// var broker = "10.100.3.14:1883"
+
+// Linux
+var broker = "10.100.3.53:1883"
+
+// Mac
+// var broker = "192.168.100.76:1883"
 
 var Publisher = &cobra.Command{
 	Use:   "publisher",
@@ -27,7 +35,7 @@ func publish(cmd *cobra.Command, args []string) error {
 
 	opts := mqtt.NewClientOptions().
 		AddBroker(broker).
-		SetClientID("sirpurrfection").
+		SetClientID("osxpublisher").
 		SetCleanSession(true).
 		SetTLSConfig(tlsConfig)
 
@@ -48,7 +56,7 @@ func publish(cmd *cobra.Command, args []string) error {
 		// 0 for Once
 		// 1 for At Least Once (may be delivered more than once)
 		logrus.Info("publishing message...")
-		token := publisher.Publish("/purfection", 1, false, message)
+		token := publisher.Publish("/input/totdc", 1, false, message)
 		if token.Wait() && token.Error() != nil {
 			logrus.Error(token.Error())
 		} else {

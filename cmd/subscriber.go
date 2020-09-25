@@ -3,10 +3,11 @@ package cmd
 import (
 	"bytes"
 	"crypto/tls"
+	"os"
+
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 var Subscriber = &cobra.Command{
@@ -30,12 +31,12 @@ func subscribe(cmd *cobra.Command, args []string) error {
 	sigKill := make(chan os.Signal)
 	opts := mqtt.NewClientOptions().
 		AddBroker(broker).
-		SetClientID("mspurrfection").
+		SetClientID("osxsubscriber").
 		SetCleanSession(true).
 		SetTLSConfig(&tls.Config{InsecureSkipVerify: true, ClientAuth: tls.NoClientCert})
 
 	opts.OnConnect = func(cli mqtt.Client) {
-		token := cli.Subscribe("/purfection", 1, createOnMessage(sigKill))
+		token := cli.Subscribe("/output/fromtdc", 0, createOnMessage(sigKill))
 		if token.Wait() && token.Error() != nil {
 			logrus.Fatal(token.Error())
 		}
