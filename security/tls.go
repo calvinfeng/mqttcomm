@@ -69,8 +69,8 @@ func NewTLSConfig() (*tls.Config, error) {
 
 	// Create tls.Config with desired tls properties
 	return &tls.Config{
-		MinVersion: tls.VersionTLS10,
-		MaxVersion: tls.VersionTLS10,
+		MinVersion:         tls.VersionTLS10,
+		MaxVersion:         tls.VersionTLS10,
 		RootCAs:            roots,
 		ClientAuth:         tls.NoClientCert,
 		InsecureSkipVerify: false,

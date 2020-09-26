@@ -1,4 +1,4 @@
-module github.com/calvinfeng/mqttcomm
+module github.com/calvinfeng/sickmqtt
 
 go 1.13
 
