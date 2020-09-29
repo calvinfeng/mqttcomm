@@ -14,7 +14,7 @@ func init() {
 
 func main() {
 	root := &cobra.Command{
-		Use: "mqttcomm",
+		Use: "sickmqtt",
 	}
 	root.AddCommand(cmd.Subscriber, cmd.Publisher, cmd.RunClient)
 	if err := root.Execute(); err != nil {
