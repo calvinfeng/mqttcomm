@@ -47,7 +47,7 @@ func (m *mqttclient) Connect() error {
 			AINValueRead:   1,
 			AINModeRead:    1,
 			AINStateRead:   1,
-			ErrorRead:      1,
+			ErrorRead: 1,
 		}, func(_ mqtt.Client, msg mqtt.Message) {
 			go m.handleMQTTMessage(msg)
 		})
@@ -83,52 +83,52 @@ func (m *mqttclient) SubmitDIOState(state DIOState) error {
 func (m *mqttclient) handleMQTTMessage(msg mqtt.Message) {
 	switch msg.Topic() {
 	case DIOStatesRead:
-		logrus.Infof("topic %s", msg.Topic())
+		logrus.Infof("reading from topic %s", msg.Topic())
 		var dioState DIOState
 		if err := json.Unmarshal(msg.Payload(), &dioState); err != nil {
 			logrus.WithError(err).Error("failed to parse payload %s", string(msg.Payload()))
 		} else {
-			logrus.Infof("successfully parsed message payload %v", dioState)
+			logrus.Infof("successfully parsed MQTT message payload %v", dioState)
 		}
 
 	case AINStateRead:
-		logrus.Infof("topic %s", msg.Topic())
+		logrus.Infof("reading from topic %s", msg.Topic())
 		var stateChange AINStateChange
 		if err := json.Unmarshal(msg.Payload(), &stateChange); err != nil {
 			logrus.WithError(err).Error("failed to parse payload %s", string(msg.Payload()))
 		} else {
-			logrus.Infof("successfully parsed message payload %v", stateChange)
+			logrus.Infof("successfully parsed MQTT message payload %v", stateChange)
 		}
 
 	case AINValueRead:
-		logrus.Infof("topic %s", msg.Topic())
+		logrus.Infof("reading from topic %s", msg.Topic())
 		var valueChange AINValueChange
 		if err := json.Unmarshal(msg.Payload(), &valueChange); err != nil {
 			logrus.WithError(err).Error("failed to parse payload %s", string(msg.Payload()))
 		} else {
-			logrus.Infof("successfully parsed message payload %v", valueChange)
+			logrus.Infof("successfully parsed MQTT message payload %v", valueChange)
 		}
 
 	case AINModeRead:
-		logrus.Infof("topic %s", msg.Topic())
+		logrus.Infof("reading from topic %s", msg.Topic())
 		var valueChange AINModeChange
 		if err := json.Unmarshal(msg.Payload(), &valueChange); err != nil {
 			logrus.WithError(err).Error("failed to parse payload %s", string(msg.Payload()))
 		} else {
-			logrus.Infof("successfully parsed message payload %v", valueChange)
+			logrus.Infof("successfully parsed MQTT message payload %v", valueChange)
 		}
 
 	case ErrorRead:
-		logrus.Infof("topic %s", msg.Topic())
-		logrus.Infof("error %s", msg.Payload())
+		logrus.Infof("reading from topic %s", msg.Topic())
+		logrus.Infof("found error %s", msg.Payload())
 
 	case LEDStatesRead:
-		logrus.Infof("topic %s", msg.Topic())
+		logrus.Infof("reading from topic %s", msg.Topic())
 		var ledStates []LEDState
 		if err := json.Unmarshal(msg.Payload(), &ledStates); err != nil {
 			logrus.WithError(err).Error("failed to parse payload %s", string(msg.Payload()))
 		} else {
-			logrus.Infof("successfully parsed message payload %v", ledStates)
+			logrus.Infof("successfully parsed MQTT message payload %v", ledStates)
 		}
 	}
 }

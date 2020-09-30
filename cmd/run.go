@@ -1,13 +1,14 @@
 package cmd
 
 import (
-	"context"
+	"bufio"
+	"fmt"
 	"github.com/calvinfeng/sickmqtt/tdc"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"math"
-	"math/rand"
-	"time"
+	"io"
+	"os"
+	"strings"
 )
 
 var RunClient = &cobra.Command{
@@ -24,28 +25,36 @@ func runClient(cmd *cobra.Command, args []string) error {
 
 	logrus.Infof("MQTT client is connected")
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	go func(ctx context.Context) {
-		ticker := time.NewTicker(time.Second)
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case <-ticker.C:
-				if err := cli.SubmitDIOState(tdc.DIOState{
-					PinName:             "DIO_A",
-					Value:               math.Round(rand.Float64()),
-					Direction:           "Output",
-					AvailableDirections: []string{"Input", "Output"},
-				}); err != nil {
-					logrus.WithError(err).Error("failed to submit DIO state to MQTT broker")
-				}
-			}
+	stdin := bufio.NewReader(os.Stdin)
+	for {
+		fmt.Println("Enter a state 0 or 1:")
+		line, err := stdin.ReadString('\n')
+		if err == io.EOF {
+			os.Exit(0)
 		}
-	}(ctx)
+		message := strings.TrimSuffix(line, "\n")
 
-	<-time.After(1 * time.Hour)
+		if message == "0" {
+			if err := cli.SubmitDIOState(tdc.DIOState{
+				PinName:             "DIO_A",
+				Value:               0,
+				Direction:           "Output",
+				AvailableDirections: []string{"Input", "Output"},
+			}); err != nil {
+				logrus.WithError(err).Error("failed to submit DIO state to MQTT broker")
+			}
+		} else if message == "1"{
+			if err := cli.SubmitDIOState(tdc.DIOState{
+				PinName:             "DIO_A",
+				Value:               1,
+				Direction:           "Output",
+				AvailableDirections: []string{"Input", "Output"},
+			}); err != nil {
+				logrus.WithError(err).Error("failed to submit DIO state to MQTT broker")
+			}
+		} else {
+			logrus.Errorf("%s is not a recognized command", message)
+		}
+	}
 	return nil
 }
