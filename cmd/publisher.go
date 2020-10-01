@@ -15,7 +15,10 @@ import (
 // var broker = "10.100.3.14:1883"
 
 // Linux
-var broker = "10.100.3.53:1883"
+// var broker = "10.100.3.53:1883"
+
+// Localhost
+var broker = "localhost:1883"
 
 // Mac
 // var broker = "192.168.100.76:1883"
@@ -55,13 +58,12 @@ func publish(cmd *cobra.Command, args []string) error {
 		// QoS stands for quality of service
 		// 0 for Once
 		// 1 for At Least Once (may be delivered more than once)
-		logrus.Info("publishing message...")
-		token := publisher.Publish("/input/totdc", 1, false, message)
+		logrus.Info("outputting dio state...")
+		token := publisher.Publish("/tdc/device001/dio/out", 1, false, message)
 		if token.Wait() && token.Error() != nil {
 			logrus.Error(token.Error())
 		} else {
 			logrus.Info("message is successfully published")
 		}
 	}
-	return nil
 }
